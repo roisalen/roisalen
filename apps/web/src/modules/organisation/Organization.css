@@ -4,6 +4,19 @@
   margin-bottom: 1rem;
 }
 
+/* Add new styles for header container */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Adjust button margin */
+.header-container .btn-primary {
+  margin-left: 1rem;
+}
+
 .main-card {
   border: none;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -28,6 +41,12 @@
   text-align: left;
   transition: background-color 0.2s ease;
   background-color: #fff;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 2rem;
+  width: 100%;
 }
 
 .organization-item:hover {
@@ -51,4 +70,10 @@
 .btn-primary:hover {
   background-color: #666666;
   border-color: #666666;
+}
+
+/* Add this to ensure the container div also respects width */
+.organization-item-container {
+  width: 100%;
+  border-radius: 4px;
 } 

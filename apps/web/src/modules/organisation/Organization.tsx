@@ -72,20 +72,15 @@ const Organization: React.FC = () => {
 
   return (
     <Container className="mt-4">
-      <Row className="mb-4">
-        <Col md={8}>
-          <h2 className="page-title">{t('CHOOSE_ORGANIZATION')}</h2>
-        </Col>
-        <Col md={4} className="text-end">
-          <Button 
-            variant="primary"
-            size="lg"
-            onClick={() => navigate('/add-organisation')}
-          >
-            {t('ADD_ORGANIZATION')}
-          </Button>
-        </Col>
-      </Row>
+      <div className="header-container">
+        <h2 className="page-title">{t('CHOOSE_ORGANIZATION')}</h2>
+        <Button 
+          variant="primary"
+          onClick={() => navigate('/add-organisation')}
+        >
+          {t('ADD_ORGANIZATION')}
+        </Button>
+      </div>
 
       <Card className="main-card">
         <Card.Body>
@@ -103,11 +98,13 @@ const Organization: React.FC = () => {
           <Row>
             {filteredOrganizations.map((org) => (
               <Col md={6} lg={4} key={org.shortName} className="mb-3">
-                <div 
-                  className="organization-item"
-                  onClick={() => handleOrganizationSelect(org)}
-                >
-                  {org.name}
+                <div className="organization-item-container">
+                  <div 
+                    className="organization-item"
+                    onClick={() => handleOrganizationSelect(org)}
+                  >
+                    {org.name}
+                  </div>
                 </div>
               </Col>
             ))}
