@@ -9,7 +9,8 @@ const config: Config = {
 
 // Override with production URL if needed
 if (window.location.hostname !== 'localhost') {
-  config.apiUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
+  // Remove the port number for production and use /rest path
+  config.apiUrl = `${window.location.protocol}//${window.location.hostname}/rest`;
 }
 
 export default config; 
