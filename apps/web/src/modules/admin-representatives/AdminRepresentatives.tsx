@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useOrganization } from '../../context/OrganizationContext';
 import { Representative } from './types';
-import { representativeService } from './services/RepresentativeService';
+import { representativeService } from './RepresentativeService';
 import './AdminRepresentatives.css';
 import parse from 'html-react-parser';
 

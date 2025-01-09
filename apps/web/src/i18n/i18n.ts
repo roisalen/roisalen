@@ -3,6 +3,8 @@ import { initReactI18next } from 'react-i18next';
 import { translationsNB } from './nb';
 import { translationsNN } from './nn';
 
+const savedLanguage = localStorage.getItem('preferredLanguage');
+
 i18n
   .use(initReactI18next)
   .init({
@@ -14,10 +16,13 @@ i18n
         translation: translationsNN
       }
     },
-    lng: 'nn', // default language
+    lng: savedLanguage || 'nn', // Use saved language or default to nn
     fallbackLng: 'nn',
     interpolation: {
       escapeValue: false
+    },
+    detection: {
+      order: ['localStorage', 'navigator']
     }
   });
 

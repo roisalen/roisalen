@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Card, Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { organizationService } from './services/OrganizationService';
+import { organizationService } from './OrganizationService';
 
 const AddOrganization: React.FC = () => {
   const { t } = useTranslation();

@@ -54,5 +54,22 @@ export const translationsNN = {
   GENERAL_INFO_INSTRUCTIONS: 'Dette feltet visast under talelista. Støttar <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">markdown</a>',
   UPDATE: 'Oppdater',
   REGISTERED_REPRESENTATIVES: 'Registrerte representantar',
-  NO_REPRESENTATIVES: 'Ingen registrerte representantar'
+  NO_REPRESENTATIVES: 'Ingen registrerte representantar',
+  CHOOSE_ORGANIZATION: 'Vel organisasjon',
+  ADD_NEW_ORGANIZATION: 'Legg til ny organisasjon',
+  SEARCH_ORGANIZATIONS: 'Søk etter organisasjonar',
+  LOADING: 'Lastar..',
+  ADD_ORGANIZATION: 'Legg til organisasjon',
+  ORGANIZATION_NAME: 'Organisasjonsnamn',
+  ORGANIZATION_SHORT_NAME: 'Kort namn',
+  ERROR_OCCURRED: 'Ein feil oppstod',
+  ORGANIZATION_NOT_FOUND: 'Organisasjonen vart ikkje funnen',
+  BACK_TO_HOME: 'Tilbake til framsida',
+  ADD_REPLY: 'Legg til replikk',
+  NEXT_SPEAKER: 'Neste talar',
+  CURRENT_SUBJECT: 'Noverande sak',
+  ADD_SPEAKER: 'Legg til talar',
+  MOVE_SPEAKER: 'Flytt talar',
+  SPEAKING_NOW: 'Har ordet',
+  REPLIES: 'Replikkar'
 }; 

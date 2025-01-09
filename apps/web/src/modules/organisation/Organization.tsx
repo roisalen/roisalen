@@ -3,7 +3,7 @@ import { Container, Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOrganization } from '../../context/OrganizationContext';
-import { organizationService } from './services/OrganizationService';
+import { organizationService } from './OrganizationService';
 import './Organization.css';
 
 interface Organization {

@@ -3,7 +3,7 @@ import { Container, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useOrganization } from '../../context/OrganizationContext';
-import { statisticsService } from './services/StatisticsService';
+import { statisticsService } from './StatisticsService';
 import './Statistics.css';
 import { createColumnChart, createPieCharts } from './charts';
 import { addDays, createPythonDate, extractValues, formatDate } from './utils';

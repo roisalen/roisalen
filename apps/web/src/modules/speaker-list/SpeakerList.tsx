@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useOrganization } from '../../context/OrganizationContext';
 import { Speaker } from './types';
-import { speakerListService } from './services/SpeakerListService';
-import { subjectService } from '../subject/services/SubjectService';
+import { speakerListService } from './SpeakerListService';
+import { subjectService } from '../../services/SubjectService';
 import './SpeakerList.css';
 
 const SpeakerList: React.FC = () => {

@@ -1,12 +1,12 @@
-import { BaseService } from '../../../services/BaseService';
-import { Representative } from '../types';
+import { BaseService } from '../../services/BaseService';
+import { Representative } from '../../../types/speaker.types';
 
 class RepresentativeService extends BaseService {
   async getRepresentatives(): Promise<Representative[]> {
     return this.get<Representative[]>('/representatives');
   }
 
-  async registerRepresentative(entry: [string, string?, string?, string?]): Promise<Representative> {
+  async registerRepresentative(entry: [string, string, string?, string?]): Promise<Representative> {
     const representative: Representative = {
       number: entry[0],
       name: entry[1] || '',

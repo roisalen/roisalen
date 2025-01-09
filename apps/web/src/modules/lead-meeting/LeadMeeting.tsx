@@ -5,10 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import parse from 'html-react-parser'; 
 import { Stopwatch } from './Stopwatch';
-import { speakerListService } from '../speaker-list/services/SpeakerListService';
-import { subjectService } from '../subject/services/SubjectService';
+import { speakerListService } from '../speaker-list/SpeakerListService';
+import { subjectService } from '../../services/SubjectService';
 import { useOrganization } from '../../context/OrganizationContext';
-import { representativeService } from '../admin-representatives/services/RepresentativeService';
+import { representativeService } from '../admin-representatives/RepresentativeService';
 import { Representative } from '../admin-representatives/types';
 import { Speaker } from '../speaker-list/types';  
 
