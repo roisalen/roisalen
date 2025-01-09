@@ -2,7 +2,7 @@ export const translationsNN = {
   SPEAKER_LIST: 'Taleliste',
   ADMIN_REPRESENTATIVES: 'Administrer representantar',
   LEAD_MEETING: 'Styr ordet',
-  STATISTICS: 'Dagens Statistikk',
+  STATISTICS: 'Statistikk',
   CHANGE: 'Endre',
   DELETE: 'Slett?',
   REGISTER_REPRESENTATIVES: 'Registrer representantar',
@@ -19,6 +19,7 @@ export const translationsNN = {
   CHOOSE_ORGANISATION: 'Tilbake til framsida',
   CREATE_ORGANISATION: 'Lag ny organisasjon',
   ADD_ORGANISATION: 'Legg til ny organisasjon her',
+  NO_ORGANIZATIONS_FOUND: 'Inge organisasjonar funne med dette namnet',
   TERMS_ORGANISATION: '<b>NB:</b> Organisasjonen kan bli automatisk sletta etter en stund. For å beholde organisasjonen din lenger, eller ha egen logo eller css, <a href="mailto:torkilv@gmail.com?subject=Premium konto Roisalen">ta kontakt.</a> ',
   ABOUT_HEADER: 'Om Ro<span class="name-i">i</span>salen',
   ABOUT_P_1: 'Vi prøvar å lage enkle digiale verktøy for å gjere store møter betre. Foreløpig har vi laga verktøy som:',
@@ -31,8 +32,6 @@ export const translationsNN = {
   ABOUT_HIGHCHARTS: 'Denne sida brukar <a href="http://www.highcharts.com">Highcharts</a>, eit kommersielt produkt som kan brukast i ikkje-kommersielle produkt under CC-BY-NC 3.0',
   nn: 'Nynorsk',
   nb: 'Bokmål',
-
-  // Lead meeting translations
   SUBJECT: 'Sakstittel',
   SUBJECT_PLACEHOLDER: 'Skriv inn sakstittel..',
   SAVE: 'Lagre',

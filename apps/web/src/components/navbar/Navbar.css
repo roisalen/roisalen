@@ -1,7 +1,7 @@
 /* Base navbar styles */
 .navbar {
   background-color: #ffffff;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
   border-bottom: 1px solid #dee2e6;
   margin-bottom: 2rem;
 }
@@ -9,7 +9,7 @@
 /* Container alignment */
 .navbar .container {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   height: 100%;
 }
 
@@ -20,6 +20,9 @@
   font-weight: 500;
   padding: 0.5rem 1rem;
   margin-right: 2rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .navbar-brand:hover,
@@ -27,13 +30,19 @@
   color: #666666 !important;
 }
 
+/* Add specific styling for the bullhorn icon */
+.navbar-brand .glyphicon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
 /* Nav container */
 .nav-links {
   display: flex;
-  align-items: center;
-  height: 100%;
+  align-items: baseline;
   margin: 0;
   padding: 0;
+  height: auto;
 }
 
 /* Nav links */
@@ -41,17 +50,17 @@
   color: #000000 !important;
   font-size: 1.8rem !important;
   padding: 0.5rem 1rem !important;
-  height: 100%;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   transition: color 0.2s ease;
+  height: auto;
 }
 
 /* Language selector container */
 .dropdown {
   display: flex;
-  align-items: center;
-  height: 100%;
+  align-items: baseline;
+  height: auto;
 }
 
 /* Dropdown toggle */
@@ -62,6 +71,7 @@
   height: 100%;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 /* Hover states */

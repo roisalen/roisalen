@@ -7,6 +7,7 @@ import { Representative } from './types';
 import { representativeService } from './RepresentativeService';
 import './AdminRepresentatives.css';
 import parse from 'html-react-parser';
+import { csvToArray } from './csvToArray';
 
 const AdminRepresentatives: React.FC = () => {
   const { t } = useTranslation();
@@ -75,7 +76,7 @@ const AdminRepresentatives: React.FC = () => {
     reader.onload = async (event) => {
       try {
         const csvText = event.target?.result as string;
-        const array = csvText.csvToArray({ trim: true, rSep: '\n' });
+        const array = csvToArray(csvText, { trim: true, rSep: '\n' });
         await representativeService.registerRepresentativesFromArray(array);
         await loadRepresentatives();
       } catch (err) {

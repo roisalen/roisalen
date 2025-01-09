@@ -7,6 +7,7 @@ import { statisticsService } from './StatisticsService';
 import './Statistics.css';
 import { createColumnChart, createPieCharts } from './charts';
 import { addDays, createPythonDate, extractValues, formatDate } from './utils';
+import parse from 'html-react-parser'; 
 
 const Statistics: React.FC = () => {
   const { t } = useTranslation();
@@ -85,7 +86,7 @@ const Statistics: React.FC = () => {
       <div id="groupChartContainer" />
       <div id="nameChartContainer" />
 
-      <p>{t('ABOUT_HIGHCHARTS')}</p>
+      <p>{parse(t('ABOUT_HIGHCHARTS'))}</p>
     </Container>
   );
 };
