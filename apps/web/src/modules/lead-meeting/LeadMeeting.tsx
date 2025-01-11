@@ -29,6 +29,7 @@ const LeadMeeting: React.FC = () => {
   });
   const [doneEstimate, setDoneEstimate] = useState(moment());
   const [error, setError] = useState<string | null>(null);
+  const [addSpeakerError, setAddSpeakerError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!organizationName) {
@@ -118,8 +119,17 @@ const LeadMeeting: React.FC = () => {
         setSpeakerList(updatedList);
       }
       setSpeakerNumber('');
+      setAddSpeakerError(null); // Clear any previous error
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add speaker');
+      if (err instanceof Error) {
+        if (err.message.includes('500')) {
+          setAddSpeakerError(t('REPRESENTATIVE_NOT_FOUND'));
+        } else {
+          setAddSpeakerError(err.message);
+        }
+      } else {
+        setAddSpeakerError(t('FAILED_TO_ADD_SPEAKER'));
+      }
     }
   };
 
@@ -211,6 +221,11 @@ const LeadMeeting: React.FC = () => {
               value={speakerNumber}
               onChange={(e) => setSpeakerNumber(e.target.value)}
             />
+            {addSpeakerError && (
+              <div className="text-danger mt-2">
+                {addSpeakerError}
+              </div>
+            )}
           </div>
           <div className="col-xs-2">
             <Button type="submit">{t('SUBMIT')}</Button>
@@ -303,7 +318,7 @@ const LeadMeeting: React.FC = () => {
                   <td>{speaker.name}</td>
                   <td>{speaker.group}</td>
                   <td>
-                    {!index && (
+                    {index > 0 && (
                       <div 
                         className="cursor-hover" 
                         onClick={() => handleMoveUp(index)}
@@ -311,7 +326,7 @@ const LeadMeeting: React.FC = () => {
                         ↑
                       </div>
                     )}
-                    {index !== speakerList.length - 1 && (
+                    {index < speakerList.length - 1 && (
                       <div 
                         className="cursor-hover" 
                         onClick={() => handleMoveDown(index)}

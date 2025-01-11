@@ -69,5 +69,7 @@ export const translationsNB = {
   ABOUT_P_2: 'Ro<span class="name-i">i</span>salen er laget på fritiden av tre aktive organisasjonsmennesker: Christian Strandenæs, Stian Lågstad og Torkil Vederhus. All kildekode er åpent tilgjengelig på <a href="http://github.com/roisalen">GitHub</a>, bidra gjerne selv! Ønsker om funksjonalitet og spesialtilpasning kan sendes til torkilv(a)gmail.com',
   LOG: 'Logg',
   nb: 'Bokmål',
-  nn: 'Nynorsk'
+  nn: 'Nynorsk',
+  REPRESENTATIVE_NOT_FOUND: 'Representanten finnes ikke i systemet',
+  FAILED_TO_ADD_SPEAKER: 'Kunne ikke legge til taler'
 }; 

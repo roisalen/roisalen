@@ -70,5 +70,7 @@ export const translationsNN = {
   ADD_SPEAKER: 'Legg til talar',
   MOVE_SPEAKER: 'Flytt talar',
   SPEAKING_NOW: 'Har ordet',
-  REPLIES: 'Replikkar'
+  REPLIES: 'Replikkar',
+  REPRESENTATIVE_NOT_FOUND: 'Representanten finst ikkje i systemet',
+  FAILED_TO_ADD_SPEAKER: 'Kunne ikkje legge til talar'
 }; 
