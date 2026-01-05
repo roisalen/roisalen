@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOrganization } from '../../context/OrganizationContext';
 import { organizationService } from './OrganizationService';
-import { Organization } from './types';
+import { Organization as OrganizationType } from './types';
 import './Organization.css';
 
 const Organization: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { setOrganization } = useOrganization();
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [organizations, setOrganizations] = useState<OrganizationType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ const Organization: React.FC = () => {
     loadOrganizations();
   }, []);
 
-  const handleOrganizationSelect = async (org: Organization) => {
+  const handleOrganizationSelect = async (org: OrganizationType) => {
     try {
       setOrganization(org);
       // Use slug if available (for obscure URLs), otherwise fall back to shortName

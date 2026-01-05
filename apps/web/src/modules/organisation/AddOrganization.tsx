@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Container, Card, Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useOrganization } from '../../context/OrganizationContext';
 import { organizationService } from './OrganizationService';
+import { Organization as OrganizationType } from './types';
 
 const AddOrganization: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { setOrganization } = useOrganization();
   const [name, setName] = useState('');
   const [shortName, setShortName] = useState('');
   const [hidden, setHidden] = useState(false);
@@ -25,8 +28,20 @@ const AddOrganization: React.FC = () => {
         organizationData.hidden = true;
       }
       
-      await organizationService.addOrganization(organizationData);
-      navigate('/');
+      // Get the created organization (includes slug from backend)
+      const createdOrg = await organizationService.addOrganization(organizationData);
+      
+      // Set organization in context
+      setOrganization({
+        name: createdOrg.name,
+        shortName: createdOrg.shortName,
+        slug: createdOrg.slug
+      });
+      
+      // Navigate to the organization's speaker-list page
+      // Use slug if available (for obscure URLs), otherwise fall back to shortName
+      const urlIdentifier = createdOrg.slug || createdOrg.shortName;
+      navigate(`/${urlIdentifier}/speaker-list`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add organization');
     }
