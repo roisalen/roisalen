@@ -71,5 +71,7 @@ export const translationsNB = {
   nb: 'Bokmål',
   nn: 'Nynorsk',
   REPRESENTATIVE_NOT_FOUND: 'Representanten finnes ikke i systemet',
-  FAILED_TO_ADD_SPEAKER: 'Kunne ikke legge til taler'
+  FAILED_TO_ADD_SPEAKER: 'Kunne ikke legge til taler',
+  HIDE_ORGANIZATION: 'Skjul organisasjon fra forsiden',
+  HIDE_ORGANIZATION_HELPER: 'Organisasjonen vil bli skjult fra forsiden og bruke en tilfeldig URL i stedet for kortnavnet'
 }; 

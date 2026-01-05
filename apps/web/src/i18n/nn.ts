@@ -72,5 +72,7 @@ export const translationsNN = {
   SPEAKING_NOW: 'Har ordet',
   REPLIES: 'Replikkar',
   REPRESENTATIVE_NOT_FOUND: 'Representanten finst ikkje i systemet',
-  FAILED_TO_ADD_SPEAKER: 'Kunne ikkje legge til talar'
+  FAILED_TO_ADD_SPEAKER: 'Kunne ikkje legge til talar',
+  HIDE_ORGANIZATION: 'Skjul organisasjon frå framsida',
+  HIDE_ORGANIZATION_HELPER: 'Organisasjonen vil bli skjult frå framsida og bruke ein tilfeldig URL i staden for kortnamnet'
 }; 

@@ -4,7 +4,8 @@ import { BaseService } from '../services/BaseService';
 interface OrganizationContextType {
   organizationName: string | null;
   shortName: string | null;
-  setOrganization: (org: { name: string; shortName: string }) => void;
+  urlIdentifier: string | null; // slug or shortName - used for URLs
+  setOrganization: (org: { name: string; shortName: string; slug?: string }) => void;
 }
 
 const OrganizationContext = createContext<OrganizationContextType | undefined>(undefined);
@@ -12,15 +13,19 @@ const OrganizationContext = createContext<OrganizationContextType | undefined>(u
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [organizationName, setOrganizationName] = useState<string | null>(null);
   const [shortName, setShortName] = useState<string | null>(null);
+  const [urlIdentifier, setUrlIdentifier] = useState<string | null>(null);
 
-  const setOrganization = (org: { name: string; shortName: string }) => {
+  const setOrganization = (org: { name: string; shortName: string; slug?: string }) => {
     setOrganizationName(org.name);
     setShortName(org.shortName);
+    // Use slug if available (for obscure URLs), otherwise use shortName
+    const identifier = org.slug || org.shortName;
+    setUrlIdentifier(identifier);
     BaseService.setOrganization(org.shortName);
   };
 
   return (
-    <OrganizationContext.Provider value={{ organizationName, shortName, setOrganization }}>
+    <OrganizationContext.Provider value={{ organizationName, shortName, urlIdentifier, setOrganization }}>
       {children}
     </OrganizationContext.Provider>
   );

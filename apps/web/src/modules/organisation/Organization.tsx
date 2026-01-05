@@ -4,12 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOrganization } from '../../context/OrganizationContext';
 import { organizationService } from './OrganizationService';
+import { Organization } from './types';
 import './Organization.css';
-
-interface Organization {
-  name: string;
-  shortName: string;
-}
 
 const Organization: React.FC = () => {
   const { t } = useTranslation();
@@ -39,7 +35,9 @@ const Organization: React.FC = () => {
   const handleOrganizationSelect = async (org: Organization) => {
     try {
       setOrganization(org);
-      navigate(`/${org.shortName}/speaker-list`);
+      // Use slug if available (for obscure URLs), otherwise fall back to shortName
+      const urlIdentifier = org.slug || org.shortName;
+      navigate(`/${urlIdentifier}/speaker-list`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to select organization');
     }

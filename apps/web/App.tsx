@@ -16,7 +16,7 @@ import Statistics from './src/modules/statistics/Statistics';
 
 const App: React.FC = () => {
   const { t } = useTranslation();
-  const { organizationName, shortName } = useOrganization();
+  const { organizationName, urlIdentifier } = useOrganization();
   
   return (
     <BrowserRouter>
@@ -27,18 +27,18 @@ const App: React.FC = () => {
             <span className="glyphicon glyphicon-bullhorn"></span>
           </Navbar.Brand>
           
-          {organizationName && shortName && (
+          {organizationName && urlIdentifier && (
             <Nav className="me-auto nav-links">
-              <Nav.Link as={Link} to={`/${shortName}/speaker-list`}>
+              <Nav.Link as={Link} to={`/${urlIdentifier}/speaker-list`}>
                 {t('SPEAKER_LIST')}
               </Nav.Link>
-              <Nav.Link as={Link} to={`/${shortName}/admin-representatives`}>
+              <Nav.Link as={Link} to={`/${urlIdentifier}/admin-representatives`}>
                 {t('ADMIN_REPRESENTATIVES')}
               </Nav.Link>
-              <Nav.Link as={Link} to={`/${shortName}/lead-meeting`}>
+              <Nav.Link as={Link} to={`/${urlIdentifier}/lead-meeting`}>
                 {t('LEAD_MEETING')}
               </Nav.Link>
-              <Nav.Link as={Link} to={`/${shortName}/statistics`}>
+              <Nav.Link as={Link} to={`/${urlIdentifier}/statistics`}>
                 {t('STATISTICS')}
               </Nav.Link>
             </Nav>
@@ -90,15 +90,18 @@ const OrganizationLoader: React.FC = () => {
         setIsLoading(true);
         setError(null);
         
-        const response = await fetch(`${config.apiUrl}/organisations`);
+        // Include hidden organizations when loading by URL (for direct access)
+        const response = await fetch(`${config.apiUrl}/organisations?includeHidden=true`);
         
         if (!response.ok) {
           throw new Error('Failed to load organizations');
         }
 
         const organizations = await response.json();
+        // Try to find by slug first (for obscure URLs), then fall back to shortName
         const organization = organizations.find(
-          (org: { shortName: string }) => 
+          (org: { shortName: string; slug?: string }) => 
+          (org.slug && org.slug.toLowerCase() === shortName.toLowerCase()) ||
           org.shortName.toLowerCase() === shortName.toLowerCase()
         );
 
@@ -108,7 +111,8 @@ const OrganizationLoader: React.FC = () => {
 
         setOrganization({
           name: organization.name,
-          shortName: organization.shortName
+          shortName: organization.shortName,
+          slug: organization.slug
         });
         setHasLoaded(true);
       } catch (err) {
