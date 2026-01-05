@@ -73,5 +73,7 @@ export const translationsNB = {
   REPRESENTATIVE_NOT_FOUND: 'Representanten finnes ikke i systemet',
   FAILED_TO_ADD_SPEAKER: 'Kunne ikke legge til taler',
   HIDE_ORGANIZATION: 'Skjul organisasjon fra forsiden',
-  HIDE_ORGANIZATION_HELPER: 'Organisasjonen vil bli skjult fra forsiden og bruke en tilfeldig URL i stedet for kortnavnet'
+  HIDE_ORGANIZATION_HELPER: 'Organisasjonen vil bli skjult fra forsiden og bruke en tilfeldig URL i stedet for kortnavnet',
+  HIDDEN_ORGS_NOTICE_TITLE: 'Viktig: Eksisterende organisasjoner er skjult',
+  HIDDEN_ORGS_NOTICE_MESSAGE: 'Alle tidligere organisasjoner laget før 2026 er nå skjult fra forsiden, men URL-en er den samme som før. Hvis du trenger URL-en til din organisasjon, vennligst kontakt torkilv@gmail.com'
 }; 

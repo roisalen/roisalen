@@ -70,6 +70,11 @@ const Organization: React.FC = () => {
 
   return (
     <Container className="mt-4">
+      <div className="alert alert-info mb-4" role="alert">
+        <strong>{t('HIDDEN_ORGS_NOTICE_TITLE')}</strong>
+        <p className="mb-0">{t('HIDDEN_ORGS_NOTICE_MESSAGE')}</p>
+      </div>
+      
       <div className="header-container">
         <h2 className="page-title">{t('CHOOSE_ORGANIZATION')}</h2>
         <Button 
