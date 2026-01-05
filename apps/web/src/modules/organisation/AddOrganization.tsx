@@ -12,6 +12,7 @@ const AddOrganization: React.FC = () => {
   const { setOrganization } = useOrganization();
   const [name, setName] = useState('');
   const [shortName, setShortName] = useState('');
+  const [email, setEmail] = useState('');
   const [hidden, setHidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,11 +20,16 @@ const AddOrganization: React.FC = () => {
     e.preventDefault();
     try {
       // Explicitly set hidden flag - false if not checked, true if checked
-      const organizationData: { name: string; shortName: string; hidden: boolean } = {
+      const organizationData: { name: string; shortName: string; hidden: boolean; email?: string } = {
         name,
         shortName,
         hidden: hidden // Explicitly set to false or true
       };
+      
+      // Add email if provided
+      if (email.trim()) {
+        organizationData.email = email.trim();
+      }
       
       // Get the created organization (includes slug from backend)
       const createdOrg = await organizationService.addOrganization(organizationData);
@@ -70,8 +76,25 @@ const AddOrganization: React.FC = () => {
                 type="text"
                 value={shortName}
                 onChange={(e) => setShortName(e.target.value)}
+                minLength={3}
+                maxLength={11}
                 required
               />
+              <Form.Text className="text-muted">
+                {t('ORGANIZATION_SHORT_NAME_HELPER')}
+              </Form.Text>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>{t('ORG_EMAIL')}</Form.Label>
+              <Form.Control
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('ORG_EMAIL')}
+              />
+              <Form.Text className="text-muted">
+                {t('ORG_EMAIL_HELPER')}
+              </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Check
