@@ -1,7 +1,8 @@
 var express = require('express')
 var app = express()
 var bodyParser = require('body-parser')
-var cors = require('cors')
+var config = require('./config')
+var corsAllowlist = require('./cors-allowlist').corsAllowlist
 
 //Get app resources
 var SpeakerListResource = require('./speaker-list-resource');
@@ -15,7 +16,9 @@ var UsageResource = require('./usage-resource');
 
 //Set server (skip listen in tests so Supertest can inject requests)
 if (process.env.NODE_ENV !== 'test') {
-	var server = app.listen(8080, function() {
+	// Fail fast at boot when MONGO_URI is missing in production
+	config.mongoUri()
+	var server = app.listen(config.port(), function() {
 		var host = server.address().address
 		var port = server.address().port
 		console.log('Listening at http://%s:%s', host, port)
@@ -24,9 +27,9 @@ if (process.env.NODE_ENV !== 'test') {
 
 module.exports = app
 
-//Use bodyparser and cors
+//CORS allowlist (ALLOWED_ORIGINS) first, then bodyparser
+app.use(corsAllowlist(config.allowedOrigins()))
 app.use(bodyParser.json())
-app.use(cors())
 
 //Representatives endpoint
 app.get('/representatives', RepresentativesResource.getAll)
