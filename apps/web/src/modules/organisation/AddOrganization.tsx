@@ -1,0 +1,122 @@
+import React, { useState } from 'react';
+import { Container, Card, Form, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useOrganization } from '../../context/OrganizationContext';
+import { organizationService } from './OrganizationService';
+
+const AddOrganization: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { setOrganization } = useOrganization();
+  const [name, setName] = useState('');
+  const [shortName, setShortName] = useState('');
+  const [email, setEmail] = useState('');
+  const [hidden, setHidden] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Explicitly set hidden flag - false if not checked, true if checked
+      const organizationData: { name: string; shortName: string; hidden: boolean; email?: string } = {
+        name,
+        shortName,
+        hidden: hidden // Explicitly set to false or true
+      };
+      
+      // Add email if provided
+      if (email.trim()) {
+        organizationData.email = email.trim();
+      }
+      
+      // Get the created organization (includes slug from backend)
+      const createdOrg = await organizationService.addOrganization(organizationData);
+      
+      // Set organization in context
+      setOrganization({
+        name: createdOrg.name,
+        shortName: createdOrg.shortName,
+        slug: createdOrg.slug
+      });
+      
+      // Navigate to the organization's speaker-list page
+      // Use slug if available (for obscure URLs), otherwise fall back to shortName
+      const urlIdentifier = createdOrg.slug || createdOrg.shortName;
+      navigate(`/${urlIdentifier}/speaker-list`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add organization');
+    }
+  };
+
+  return (
+    <Container className="mt-4">
+      <Card>
+        <Card.Header>{t('ADD_ORGANIZATION')}</Card.Header>
+        <Card.Body>
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>{t('ORGANIZATION_NAME')}</Form.Label>
+              <Form.Control
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>{t('ORGANIZATION_SHORT_NAME')}</Form.Label>
+              <Form.Control
+                type="text"
+                value={shortName}
+                onChange={(e) => setShortName(e.target.value)}
+                minLength={3}
+                maxLength={11}
+                required
+              />
+              <Form.Text className="text-muted">
+                {t('ORGANIZATION_SHORT_NAME_HELPER')}
+              </Form.Text>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>{t('ORG_EMAIL')}</Form.Label>
+              <Form.Control
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('ORG_EMAIL')}
+              />
+              <Form.Text className="text-muted">
+                {t('ORG_EMAIL_HELPER')}
+              </Form.Text>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                id="hidden-checkbox"
+                label={t('HIDE_ORGANIZATION')}
+                checked={hidden}
+                onChange={(e) => setHidden(e.target.checked)}
+              />
+              {hidden && (
+                <Form.Text className="text-muted">
+                  {t('HIDE_ORGANIZATION_HELPER')}
+                </Form.Text>
+              )}
+            </Form.Group>
+            <Button type="submit" variant="primary">
+              {t('SAVE')}
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
+  );
+};
+
+export default AddOrganization; 

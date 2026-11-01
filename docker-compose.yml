@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/roisalen
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+  mongo:
+    image: mongo:8.0
+    ports:
+      - "27017:27017"
