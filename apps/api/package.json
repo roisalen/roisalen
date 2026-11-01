@@ -1,14 +1,14 @@
 {
-  "name": "roisalen-server",
+  "name": "@roisalen/api",
   "version": "0.0.1",
   "description": "Rest web-server for speakerlist and administration",
   "main": "server.js",
   "dependencies": {
-    "mongodb": "^3.7.4",
-    "mongojs": "^2.6.0",
-    "express": "^4.21.2",
     "body-parser": "^1.20.3",
-    "cors": "^2.8.6"
+    "cors": "^2.8.6",
+    "express": "^4.21.2",
+    "mongodb": "^3.7.4",
+    "mongojs": "^2.6.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
@@ -20,16 +20,9 @@
   },
   "author": "Torkil Vederhus",
   "license": "GNU GPL",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/torkilv/roisalen"
-  },
   "keywords": [
     "meetings",
     "administration"
   ],
-  "bugs": {
-    "url": "https://github.com/torkilv/roisalen/issues"
-  },
-  "homepage": "https://github.com/torkilv/roisalen"
+  "private": true
 }

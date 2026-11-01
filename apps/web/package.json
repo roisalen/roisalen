@@ -1,10 +1,7 @@
 {
-  "name": "roisalen-frontend",
+  "name": "@roisalen/web",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": ">=20.19.0 || >=22.13.0"
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

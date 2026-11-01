@@ -1,0 +1,19 @@
+node_modules/
+coverage/
+dist/
+playwright-report/
+test-results/
+.DS_Store
+
+.env
+.env.*
+!.env.example
+
+# Never commit database data, dumps or organisation exports
+data/
+data2/
+dump/
+*.bson
+*.archive
+*.gz
+organizations-export-*
