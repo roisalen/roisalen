@@ -16,7 +16,8 @@
   },
   "scripts": {
     "test": "NODE_ENV=test NODE_OPTIONS='--experimental-vm-modules --disable-warning=ExperimentalWarning' jest --runInBand",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --env-file-if-exists=.env server.js"
   },
   "author": "Torkil Vederhus",
   "license": "GNU GPL",

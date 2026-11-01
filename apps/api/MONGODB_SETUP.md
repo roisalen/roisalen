@@ -73,5 +73,5 @@ docker stop mongodb
 - **Database**: `roisalen`
 - **Connection String**: `127.0.0.1:27017/roisalen`
 
-You can override the connection string with the `MONGOLAB_URI` environment variable.
+You can override the connection string with the `MONGO_URI` environment variable. The URI must include the database name (`.../roisalen`), otherwise the driver writes to the `test` database.
 
