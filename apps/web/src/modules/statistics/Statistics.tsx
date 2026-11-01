@@ -1,0 +1,99 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Container, Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useOrganization } from '../../context/OrganizationContext';
+import { statisticsService } from './StatisticsService';
+import './Statistics.css';
+import { createColumnChart, createPieCharts } from './charts';
+import { addDays, createPythonDate, extractValues, formatDate } from './utils';
+import parse from 'html-react-parser'; 
+
+const Statistics: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { organizationName } = useOrganization();
+  const [startDate, setStartDate] = useState(formatDate(new Date()));
+  const [endDate, setEndDate] = useState(formatDate(addDays(new Date(), 1)));
+  const [error, setError] = useState<string | null>(null);
+
+  const getStatisticsByType = useCallback(async (
+    sortType: string, 
+    containerId: string | string[], 
+    typeLabel: string, 
+    chartType: 'pie' | 'column'
+  ) => {
+    const data = await statisticsService.getStatistics(
+      sortType, 
+      createPythonDate(startDate), 
+      createPythonDate(endDate)
+    );
+    
+    const extractedValues = extractValues(Array.isArray(data) ? data : []);
+    
+    if (chartType === 'column') {
+      createColumnChart(extractedValues, containerId as string, typeLabel);
+    } else if (chartType === 'pie') {
+      createPieCharts(extractedValues, containerId as string[], typeLabel);
+    }
+  }, [startDate, endDate]);
+
+  const loadStatistics = useCallback(async () => {
+    try {
+      await Promise.all([
+        getStatisticsByType('sex', ['firstSexChartContainer', 'secondSexChartContainer'], 'Kjønn', 'pie'),
+        getStatisticsByType('group', 'groupChartContainer', 'Fraksjon', 'column'),
+        getStatisticsByType('name', 'nameChartContainer', 'Representant', 'column')
+      ]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load statistics');
+    }
+  }, [getStatisticsByType]);
+
+  useEffect(() => {
+    if (!organizationName) {
+      navigate('/');
+      return;
+    }
+    void loadStatistics();
+  }, [organizationName, navigate, loadStatistics]);
+
+  return (
+    <Container>
+      <h1>{t('STATISTICS')}</h1>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+      
+      <Form onSubmit={(e) => {
+        e.preventDefault();
+        loadStatistics();
+      }}>
+        <Form.Control
+          type="date"
+          className="display-inline-quarter-width"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <Form.Control
+          type="date"
+          className="display-inline-quarter-width"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+        <Form.Control type="submit" style={{ display: 'none' }} />
+      </Form>
+
+      <div id="firstSexChartContainer" className="display-inline-half-width" />
+      <div id="secondSexChartContainer" className="display-inline-half-width" />
+      <div id="groupChartContainer" />
+      <div id="nameChartContainer" />
+
+      <p>{parse(t('ABOUT_HIGHCHARTS'))}</p>
+    </Container>
+  );
+};
+
+export default Statistics; 
