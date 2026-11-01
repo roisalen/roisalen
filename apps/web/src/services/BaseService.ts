@@ -35,7 +35,7 @@ export abstract class BaseService {
     return this.handleResponse<T>(response);
   }
 
-  protected async post<T>(url: string, body: any): Promise<T> {
+  protected async post<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(`${this.baseUrl}${url}`, {
       method: 'POST',
       headers: this.getHeaders(),
@@ -44,7 +44,7 @@ export abstract class BaseService {
     return this.handleResponse<T>(response);
   }
 
-  protected async put<T>(url: string, body: any): Promise<T> {
+  protected async put<T>(url: string, body: unknown): Promise<T> {
     const response = await fetch(`${this.baseUrl}${url}`, {
       method: 'PUT',
       headers: this.getHeaders(),

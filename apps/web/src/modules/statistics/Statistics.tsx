@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -17,27 +17,7 @@ const Statistics: React.FC = () => {
   const [endDate, setEndDate] = useState(formatDate(addDays(new Date(), 1)));
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!organizationName) {
-      navigate('/');
-      return;
-    }
-    loadStatistics();
-  }, [organizationName, navigate]);
-
-  const loadStatistics = async () => {
-    try {
-      await Promise.all([
-        getStatisticsByType('sex', ['firstSexChartContainer', 'secondSexChartContainer'], 'Kjønn', 'pie'),
-        getStatisticsByType('group', 'groupChartContainer', 'Fraksjon', 'column'),
-        getStatisticsByType('name', 'nameChartContainer', 'Representant', 'column')
-      ]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load statistics');
-    }
-  };
-
-  const getStatisticsByType = async (
+  const getStatisticsByType = useCallback(async (
     sortType: string, 
     containerId: string | string[], 
     typeLabel: string, 
@@ -49,18 +29,43 @@ const Statistics: React.FC = () => {
       createPythonDate(endDate)
     );
     
-    const extractedValues = extractValues(data);
+    const extractedValues = extractValues(Array.isArray(data) ? data : []);
     
     if (chartType === 'column') {
       createColumnChart(extractedValues, containerId as string, typeLabel);
     } else if (chartType === 'pie') {
       createPieCharts(extractedValues, containerId as string[], typeLabel);
     }
-  };
+  }, [startDate, endDate]);
+
+  const loadStatistics = useCallback(async () => {
+    try {
+      await Promise.all([
+        getStatisticsByType('sex', ['firstSexChartContainer', 'secondSexChartContainer'], 'Kjønn', 'pie'),
+        getStatisticsByType('group', 'groupChartContainer', 'Fraksjon', 'column'),
+        getStatisticsByType('name', 'nameChartContainer', 'Representant', 'column')
+      ]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load statistics');
+    }
+  }, [getStatisticsByType]);
+
+  useEffect(() => {
+    if (!organizationName) {
+      navigate('/');
+      return;
+    }
+    void loadStatistics();
+  }, [organizationName, navigate, loadStatistics]);
 
   return (
     <Container>
       <h1>{t('STATISTICS')}</h1>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
       
       <Form onSubmit={(e) => {
         e.preventDefault();

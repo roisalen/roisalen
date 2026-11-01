@@ -22,14 +22,21 @@ export function addDays(date: Date, days: number): Date {
   return result;
 }
 
-export function extractValues(data: any[]) {
+interface StatisticsRow {
+  _id: string;
+  mainEntries: number;
+  replies: number;
+}
+
+export function extractValues(data: unknown[]) {
   const entries: number[] = [];
   const ids: string[] = [];
   const replies: number[] = [];
   const idAndEntries: [string, number][] = [];
   const idAndReplies: [string, number][] = [];
 
-  data.forEach(valueJson => {
+  data.forEach((row) => {
+    const valueJson = row as StatisticsRow;
     if (valueJson._id) {
       ids.push(valueJson._id);
       entries.push(valueJson.mainEntries);

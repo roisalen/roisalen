@@ -1,7 +1,7 @@
 import { BaseService } from '../../services/BaseService';
 
 class StatisticsService extends BaseService {
-  async getStatistics(type: string, startDate?: string, endDate?: string): Promise<any> {
+  async getStatistics(type: string, startDate?: string, endDate?: string): Promise<unknown> {
     let url = `/statistics/${type}`;
     if (startDate) {
       url += `/${startDate}`;

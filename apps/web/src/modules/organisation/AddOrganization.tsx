@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOrganization } from '../../context/OrganizationContext';
 import { organizationService } from './OrganizationService';
-import { Organization as OrganizationType } from './types';
 
 const AddOrganization: React.FC = () => {
   const { t } = useTranslation();

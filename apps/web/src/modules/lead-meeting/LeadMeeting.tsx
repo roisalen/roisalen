@@ -5,12 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import parse from 'html-react-parser'; 
 import { Stopwatch } from './Stopwatch';
+import { getActiveSpeakingSessionId } from './speakingSession';
 import { speakerListService } from '../speaker-list/SpeakerListService';
 import { subjectService } from '../../services/SubjectService';
 import { useOrganization } from '../../context/OrganizationContext';
 import { representativeService } from '../admin-representatives/RepresentativeService';
 import { Representative } from '../admin-representatives/types';
-import { Speaker } from '../speaker-list/types';  
+import { Speaker } from '../speaker-list/types';
+
+/** Poll interval for live speaker state (stopwatch + list sync from other devices). */
+const MEETING_REFRESH_MS = 2000;
 
 const LeadMeeting: React.FC = () => {
   const { t } = useTranslation();
@@ -31,44 +35,26 @@ const LeadMeeting: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [addSpeakerError, setAddSpeakerError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadMeetingData = useCallback(async () => {
     if (!organizationName) {
-      navigate('/');
       return;
     }
-
-    const loadInitialData = async () => {
-      try {
-        const [speakerData, subjectData, messageData, representativesData] = await Promise.all([
-          speakerListService.getSpeakerList(),
-          subjectService.getSubject(),
-          subjectService.getMessage(),
-          representativeService.getRepresentatives()
-        ]);
-
-        setSpeakerList(speakerData);
-        setSubjectTitle(subjectData);
-        setMessage(messageData);
-        setRepresentatives(representativesData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load data');
-      }
-    };
-
-    loadInitialData();
-    const intervalId = setInterval(loadInitialData, 5000);
-    return () => clearInterval(intervalId);
-  }, [organizationName, navigate]);
-
-  const loadSpeakerList = useCallback(async () => {
     try {
-      const data = await speakerListService.getSpeakerList();
-      setSpeakerList(data);
-      estimateTime(); // Call estimate time when speaker list updates
+      const [speakerData, subjectData, messageData, representativesData] = await Promise.all([
+        speakerListService.getSpeakerList(),
+        subjectService.getSubject(),
+        subjectService.getMessage(),
+        representativeService.getRepresentatives()
+      ]);
+
+      setSpeakerList(speakerData);
+      setSubjectTitle(subjectData);
+      setMessage(messageData);
+      setRepresentatives(representativesData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load speaker list');
+      setError(err instanceof Error ? err.message : 'Failed to load data');
     }
-  }, []);
+  }, [organizationName]);
 
   useEffect(() => {
     if (!organizationName) {
@@ -76,13 +62,12 @@ const LeadMeeting: React.FC = () => {
       return;
     }
 
-    // Initial load
-    loadSpeakerList();
-
-    // Set up polling
-    const intervalId = setInterval(loadSpeakerList, 5000);
+    void loadMeetingData();
+    const intervalId = setInterval(() => {
+      void loadMeetingData();
+    }, MEETING_REFRESH_MS);
     return () => clearInterval(intervalId);
-  }, [organizationName, navigate, loadSpeakerList]);
+  }, [organizationName, navigate, loadMeetingData]);
 
   const estimateTime = useCallback(() => {
     const newEstimate = moment();
@@ -95,6 +80,10 @@ const LeadMeeting: React.FC = () => {
     }
     setDoneEstimate(newEstimate);
   }, [speakerList.length, estimateParams]);
+
+  useEffect(() => {
+    estimateTime();
+  }, [estimateTime, speakerList]);
 
   const handleSubmitSubject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,6 +171,8 @@ const LeadMeeting: React.FC = () => {
     return parse(text);
   };
 
+  const activeSpeakingSessionId = getActiveSpeakingSessionId(speakerList);
+
   if (error) {
     return (
       <Container className="mt-5">
@@ -235,7 +226,7 @@ const LeadMeeting: React.FC = () => {
 
       <div className="timer-container">
         <div id="stopwatch" className="fontSizeDoubled alignCenter">
-          <Stopwatch delay={1000} />
+          <Stopwatch delay={1000} activeSessionId={activeSpeakingSessionId} />
         </div>
         <div id="timeLeft">
           {t('TIME_LEFT')} {doneEstimate.format("H:mm")}

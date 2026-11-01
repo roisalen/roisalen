@@ -2,15 +2,27 @@ interface Config {
   apiUrl: string;
 }
 
-const config: Config = {
-  /*apiUrl: 'http://localhost:3000' // Default development URL */
-  apiUrl: 'https://roisalen.no/rest'
-};
-
-// Override with production URL if needed
-if (window.location.hostname !== 'localhost') {
-  // Remove the port number for production and use /rest path
-  config.apiUrl = `${window.location.protocol}//${window.location.hostname}/rest`;
+/**
+ * API base URL (no trailing slash).
+ * - `VITE_API_URL`: override for local full-stack or Playwright E2E (see e2e/fixtures).
+ * - Production: same host as the SPA with `/rest` path.
+ * - Localhost default: public API at roisalen.no (unchanged for day-to-day dev).
+ */
+function resolveApiUrl(): string {
+  const fromEnv = import.meta.env.VITE_API_URL as string | undefined;
+  if (fromEnv?.trim()) {
+    return fromEnv.replace(/\/$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return `${window.location.protocol}//${window.location.hostname}/rest`;
+  }
+  return 'https://roisalen.no/rest';
 }
 
-export default config; 
+const config: Config = {
+  get apiUrl() {
+    return resolveApiUrl();
+  },
+};
+
+export default config;
