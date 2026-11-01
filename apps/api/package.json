@@ -7,11 +7,12 @@
     "body-parser": "^1.20.3",
     "cors": "^2.8.6",
     "express": "^4.21.2",
-    "mongodb": "^3.7.4",
+    "mongodb": "^7.8.0",
     "mongojs": "^2.6.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^11.3.0",
     "supertest": "^7.0.0"
   },
   "scripts": {
@@ -24,5 +25,10 @@
     "meetings",
     "administration"
   ],
-  "private": true
+  "private": true,
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "8.0.4"
+    }
+  }
 }
