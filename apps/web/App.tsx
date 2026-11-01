@@ -13,6 +13,7 @@ import './src/components/navbar/Navbar.css';
 import LeadMeeting from './src/modules/lead-meeting/LeadMeeting';
 import AdminRepresentatives from './src/modules/admin-representatives/AdminRepresentatives';
 import Statistics from './src/modules/statistics/Statistics';
+import UsageDashboard from './src/modules/usage-dashboard/UsageDashboard';
 
 const App: React.FC = () => {
   const { t } = useTranslation();
@@ -52,6 +53,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Organization />} />
           <Route path="/choose-organisation" element={<Organization />} />
           <Route path="/add-organisation" element={<AddOrganization />} />
+          <Route path="/usage" element={<UsageDashboard />} />
           <Route path="/:shortName" element={<OrganizationLoader />}>
             <Route path="speaker-list" element={<SpeakerList />} />
             <Route path="admin-representatives" element={<AdminRepresentatives />} />
