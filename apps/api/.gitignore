@@ -1,0 +1,37 @@
+venv
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.pyc
+.DS_*
+
+pids
+logs
+results
+
+npm-debug.log
+node_modules
+cert.pem
+key.pem
+
+# Organization export files
+organizations-export-*.json
+organizations-export-*.txt
+
+# Local MongoDB data, never commit
+data/
+data2/
+
+# Retired AWS CDK experiment (archived outside the repo)
+roisalen-cdk/
+
+coverage/
+.env
+.env.*
+!.env.example
+*.pkg
