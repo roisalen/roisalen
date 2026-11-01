@@ -8,6 +8,4 @@ module.exports = async function globalSetup() {
     globalThis.__MONGOD__ = mongod;
     process.env.MONGO_URI = mongod.getUri('roisalen-test');
   }
-  // Read by the pre-migration mongojs code; removed in Task 9
-  process.env.MONGOLAB_URI = process.env.MONGO_URI;
 };

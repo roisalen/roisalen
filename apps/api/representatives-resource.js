@@ -1,15 +1,14 @@
 var Speaker = require("./models/speaker");
-var mongojs = require("mongojs");
-var connection_string = process.env.MONGOLAB_URI || '127.0.0.1:27017/roisalen';
-var db = mongojs(connection_string, []);
+var db = require("./db");
 
+function representatives(organisation) {
+	return db.getDb().collection(organisation + "-representatives");
+}
 
 function getSpeakerFromDB(organisation, speakerId, callBack) {
-	var representatives = db.collection(organisation+"-representatives");
-	representatives.findOne({number: speakerId}, function(err, success) {
-		if (success){
-			return callBack(success);
-		}
+	representatives(organisation).findOne({number: speakerId}).then(function(speaker) {
+		return callBack(speaker || false);
+	}, function() {
 		return callBack(false);
 	});
 }
@@ -18,14 +17,11 @@ function getSpeakerFromDB(organisation, speakerId, callBack) {
 module.exports.getSpeakerFromDB = getSpeakerFromDB;
 
 module.exports.getAll = function(req, res, next) {
-	var representatives = db.collection(req.header('X-organisation')+"-representatives");
-	representatives.find().sort({number: 1}, function(err, success){
-		if (success) {
-			res.status(200).send(success);
-		} else {
-			res.status(500).send();
-			return next(err);
-		}
+	representatives(req.header('X-organisation')).find().sort({number: 1}).toArray().then(function(success) {
+		res.status(200).send(success);
+	}, function(err) {
+		res.status(500).send();
+		return next(err);
 	});
 };
 
@@ -42,36 +38,28 @@ module.exports.get = function(req, res, next) {
 };
 
 module.exports.delete = function(req, res, next) {
-	var representatives = db.collection(req.header('X-organisation')+"-representatives");
-	representatives.remove({number: parseInt(req.params.speakerId)}, function(err, success){
-		if (success) {
-			res.status(200).send();
-			return next();
-		} else {
-			res.status(500).send();
-		}
-
+	representatives(req.header('X-organisation')).deleteMany({number: parseInt(req.params.speakerId)}).then(function() {
+		res.status(200).send();
+		return next();
+	}, function(err) {
+		res.status(500).send();
 		return next(err);
 	});
 }
 
 module.exports.deleteAll = function(req, res, next) {
-	var representatives = db.collection(req.header('X-organisation')+"-representatives");
-	representatives.remove({},function(err, success) {
-		if (success) {
-			console.log("deleted all");
-			res.status(200).send();
-		} else {
-			res.status(500).send();
-		}
+	representatives(req.header('X-organisation')).deleteMany({}).then(function() {
+		console.log("deleted all");
+		res.status(200).send();
+		return next();
+	}, function(err) {
+		res.status(500).send();
 		return next(err);
 	});
 }
 
 
 module.exports.add = function(req, res, next) {
-	var representatives = db.collection(req.header('X-organisation')+"-representatives");
-
 	var speakerJson = req.body;
 	var speakerNumber = parseInt(speakerJson.number);
 
@@ -82,13 +70,11 @@ module.exports.add = function(req, res, next) {
 
 	var speaker = new Speaker(speakerJson.name, speakerNumber, speakerJson.sex, speakerJson.group);
 
-	representatives.save(speaker, function(err, success) {
-		if (success) {
-			res.status(201).send(speaker);
-			return next();
-		} else {
-			res.status(500).send();
-			return next(err);
-		}
+	representatives(req.header('X-organisation')).replaceOne({_id: speaker._id}, speaker, {upsert: true}).then(function() {
+		res.status(201).send(speaker);
+		return next();
+	}, function(err) {
+		res.status(500).send();
+		return next(err);
 	});
 }

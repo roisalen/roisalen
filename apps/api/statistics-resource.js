@@ -1,6 +1,4 @@
-var mongojs = require("mongojs");
-var connection_string = process.env.MONGOLAB_URI || '127.0.0.1:27017/roisalen';
-var db = mongojs(connection_string, ['statistics']);
+var db = require("./db");
 var SubjectResource = require('./subject-resource');
 
 function logRepresentativeSpoke(representative, organisation) {
@@ -17,9 +15,9 @@ function saveLogEntry(logEntry) {
 	logEntry.date = today.getDate() + "." + today.getMonth() + "." + today.getFullYear();
 	logEntry.time = today.getHours() + "." + today.getMinutes();
 	logEntry.subject = SubjectResource.getSubject(logEntry.organisation);
-	db.statistics.save(logEntry, function(err, saved) {
-  		if( err || !saved ) console.log("Statistics: LogEntry not saved");
-  	});
+	db.getDb().collection('statistics').insertOne(logEntry).catch(function() {
+		console.log("Statistics: LogEntry not saved");
+	});
 }
 
 function logRepresentativeReplied(representative, organisation) {
@@ -48,7 +46,7 @@ function getRankedListByField(req, res, next) {
 		toDate = new Date();
 	}
 
-	db.statistics.aggregate([
+	db.getDb().collection('statistics').aggregate([
 	{
 		$match: {
 			organisation : req.header('X-organisation'),
@@ -80,15 +78,13 @@ function getRankedListByField(req, res, next) {
 		}
 	},		
 	{ $sort: {mainEntries: -1, replies: -1}}
-	], function(err, groupsRanked) {
-		if( err ) {
-			console.log("Statistics: Could not get aggregate of " + req.params.field + " , error: " + err);
-			res.status(500).send();
-			return next(err);
-		} else {
-			res.status(200).send(groupsRanked);
-			return next()
-		} 
+	]).toArray().then(function(groupsRanked) {
+		res.status(200).send(groupsRanked);
+		return next();
+	}, function(err) {
+		console.log("Statistics: Could not get aggregate of " + req.params.field + " , error: " + err);
+		res.status(500).send();
+		return next(err);
 	});
 }
 

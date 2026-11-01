@@ -1,6 +1,4 @@
-var mongojs = require('mongojs');
-var connection_string = process.env.MONGOLAB_URI || '127.0.0.1:27017/roisalen';
-var db = mongojs(connection_string, ['statistics', 'organisations']);
+var db = require('./db');
 var SpeakerListResource = require('./speaker-list-resource');
 
 function adminConfigured() {
@@ -36,59 +34,57 @@ module.exports.getSummary = function (req, res, next) {
 	thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 	thirtyDaysAgo.setHours(0, 0, 0, 0);
 
-	db.statistics.aggregate([
-		{
-			$match: {
-				organisation: { $exists: true, $ne: '' },
-				fullDate: { $gte: thirtyDaysAgo }
-			}
-		},
-		{
-			$group: {
-				_id: '$organisation',
-				eventCount: { $sum: 1 },
-				lastActivity: { $max: '$fullDate' },
-				firstActivityInPeriod: { $min: '$fullDate' }
-			}
-		},
-		{ $sort: { lastActivity: -1 } }
-	], function (err, recentAgg) {
-		if (err) {
-			console.log('Usage summary aggregate error:', err);
-			res.status(500).json({ error: 'Failed to load usage statistics' });
-			return next(err);
-		}
+	var database = db.getDb();
 
-		db.organisations.find({}, function (err2, orgs) {
-			if (err2) {
-				console.log('Usage summary organisations error:', err2);
-				res.status(500).json({ error: 'Failed to load organisations' });
-				return next(err2);
-			}
-
-			var nameByShort = {};
-			(orgs || []).forEach(function (o) {
-				var key = o.shortName || o._id;
-				if (key) {
-					nameByShort[String(key)] = o.name || String(key);
+	Promise.all([
+		database.collection('statistics').aggregate([
+			{
+				$match: {
+					organisation: { $exists: true, $ne: '' },
+					fullDate: { $gte: thirtyDaysAgo }
 				}
-			});
+			},
+			{
+				$group: {
+					_id: '$organisation',
+					eventCount: { $sum: 1 },
+					lastActivity: { $max: '$fullDate' },
+					firstActivityInPeriod: { $min: '$fullDate' }
+				}
+			},
+			{ $sort: { lastActivity: -1 } }
+		]).toArray(),
+		database.collection('organisations').find({}).toArray()
+	]).then(function (results) {
+		var recentAgg = results[0];
+		var orgs = results[1];
 
-			var recentMeetings = (recentAgg || []).map(function (g) {
-				return {
-					organisation: g._id,
-					eventCount: g.eventCount,
-					lastActivity: g.lastActivity,
-					firstActivityInPeriod: g.firstActivityInPeriod
-				};
-			});
-
-			res.status(200).json({
-				generatedAt: new Date().toISOString(),
-				activeMeetings: enrichOrgNames(activeRaw, nameByShort),
-				recentMeetingsLast30Days: enrichOrgNames(recentMeetings, nameByShort)
-			});
-			return next();
+		var nameByShort = {};
+		(orgs || []).forEach(function (o) {
+			var key = o.shortName || o._id;
+			if (key) {
+				nameByShort[String(key)] = o.name || String(key);
+			}
 		});
+
+		var recentMeetings = (recentAgg || []).map(function (g) {
+			return {
+				organisation: g._id,
+				eventCount: g.eventCount,
+				lastActivity: g.lastActivity,
+				firstActivityInPeriod: g.firstActivityInPeriod
+			};
+		});
+
+		res.status(200).json({
+			generatedAt: new Date().toISOString(),
+			activeMeetings: enrichOrgNames(activeRaw, nameByShort),
+			recentMeetingsLast30Days: enrichOrgNames(recentMeetings, nameByShort)
+		});
+		return next();
+	}, function (err) {
+		console.log('Usage summary error:', err);
+		res.status(500).json({ error: 'Failed to load usage statistics' });
+		return next(err);
 	});
 };

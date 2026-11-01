@@ -1,7 +1,10 @@
-var mongojs = require("mongojs");
 var crypto = require("crypto");
-var connection_string = process.env.MONGOLAB_URI || '127.0.0.1:27017/roisalen';
-var db = mongojs(connection_string, ['organisations']);
+var ObjectId = require("mongodb").ObjectId;
+var db = require("./db");
+
+function organisations() {
+	return db.getDb().collection('organisations');
+}
 
 function compare(orgA, orgB) {
 	return orgA.name.localeCompare(orgB.name);
@@ -28,16 +31,14 @@ function getOrganisations(req, res, next) {
 		// Only show organizations that explicitly have hidden: false
 		query.hidden = false;
 	}
-	db.organisations.find(query, function(err, success) {
-		if (success) {
-			success.sort(compare);
-			res.status(200).send(success);
-			return next();
-		} else {
-			console.log(err)
-			res.status(500).send();
-			return next(err);
-		}
+	organisations().find(query).toArray().then(function(success) {
+		success.sort(compare);
+		res.status(200).send(success);
+		return next();
+	}, function(err) {
+		console.log(err)
+		res.status(500).send();
+		return next(err);
 	});
 }
 
@@ -51,32 +52,28 @@ function addOrganisation(req, res, next) {
 	if (!req.body.slug) {
 		req.body.slug = generateSlug();
 	}
-	db.organisations.save(req.body, function(err, success) {
-		if (!err && success) {
-			res.status(201).send(success);
-			return next();
-		} else {
-			console.log(err);
-			res.status(500).send();
-			return next(err);
-		}
+	organisations().replaceOne({_id: req.body._id}, req.body, {upsert: true}).then(function() {
+		res.status(201).send(req.body);
+		return next();
+	}, function(err) {
+		console.log(err);
+		res.status(500).send();
+		return next(err);
 	});
 }
 
 function deleteOrganisation(req, res, next) {
 	var id = req.params.id;
-	if (id.length > 12) {
-		id = db.ObjectId(id);
+	if (id.length > 12 && ObjectId.isValid(id)) {
+		id = new ObjectId(id);
 	}
-	db.organisations.remove({_id: id}, function (err, success) {
-		if (success) {
-			console.log("deleted all");
-			res.status(200).send();
-		} else {
-			res.status(500).send();
-		}
+	organisations().deleteMany({_id: id}).then(function() {
+		console.log("deleted all");
+		res.status(200).send();
+		return next();
+	}, function(err) {
+		res.status(500).send();
 		return next(err);
-
 	});
 }
 

@@ -1,19 +1,17 @@
-var mongojs = require("mongojs");
-var connection_string = process.env.MONGOLAB_URI || '127.0.0.1:27017/roisalen';
-var db = mongojs(connection_string, []);
-
+var db = require("./db");
 
 function getStatus(req, res, next) {
-    db.runCommand({ping: 1}, function (err, success) {
-        if(!err && success.ok) {
+	db.getDb().command({ping: 1}).then(function (success) {
+		if (success.ok) {
 			res.status(200).send("db is ok :)\n");
 			return next();
-		} else {
-			res.status(503).send("db is not ok :(\n");
-			return next(err);
 		}
+		res.status(503).send("db is not ok :(\n");
+		return next();
+	}, function (err) {
+		res.status(503).send("db is not ok :(\n");
+		return next(err);
 	});
 }
 
 module.exports.get = getStatus;
-
