@@ -76,3 +76,7 @@ describe('config', () => {
     });
   });
 });
+
+test('gate check: deliberately failing (do not merge)', () => {
+  expect(1).toBe(2);
+});
