@@ -17,6 +17,8 @@ results
 npm-debug.log
 node_modules
 playwright-report
+playwright-report-fullstack
 test-results
+test-results-fullstack
 coverage
 dist
