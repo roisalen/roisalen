@@ -2,7 +2,7 @@ var cors = require('cors');
 
 function patternToRegExp(pattern) {
 	var escaped = pattern.replace(/\/$/, '').replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-	return new RegExp('^' + escaped.replace(/\*/g, '[a-z0-9-]+') + '$', 'i');
+	return new RegExp('^' + escaped.replace(/\*/g, '[a-z0-9-]+'), 'i');
 }
 
 function isOriginAllowed(origin, patterns) {
