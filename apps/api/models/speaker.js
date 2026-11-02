@@ -1,5 +1,3 @@
-var SpeakerQueue = require("./speakerqueue");
-
 module.exports = function(name, number, sex, group) {
 	this.name = name;
 	this.number = number;
