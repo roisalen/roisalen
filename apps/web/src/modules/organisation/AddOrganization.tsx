@@ -60,7 +60,7 @@ const AddOrganization: React.FC = () => {
             </div>
           )}
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="add-org-name">
               <Form.Label>{t('ORGANIZATION_NAME')}</Form.Label>
               <Form.Control
                 type="text"
@@ -69,7 +69,7 @@ const AddOrganization: React.FC = () => {
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="add-org-short-name">
               <Form.Label>{t('ORGANIZATION_SHORT_NAME')}</Form.Label>
               <Form.Control
                 type="text"
@@ -83,7 +83,7 @@ const AddOrganization: React.FC = () => {
                 {t('ORGANIZATION_SHORT_NAME_HELPER')}
               </Form.Text>
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="add-org-email">
               <Form.Label>{t('ORG_EMAIL')}</Form.Label>
               <Form.Control
                 type="email"

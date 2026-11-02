@@ -40,8 +40,8 @@ function getRankedListByField(req, res, next) {
 	}
 
 	if (req.params.toDate) {
-		var dateParams = req.params.toDate.split('-');
-		toDate = new Date(dateParams[2], dateParams[1], dateParams[0]);
+		var toDateParams = req.params.toDate.split('-');
+		toDate = new Date(toDateParams[2], toDateParams[1], toDateParams[0]);
 	} else {
 		toDate = new Date();
 	}

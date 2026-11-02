@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  api-test:
+    name: API tests (MongoDB 8.0)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      mongo:
+        image: mongo:8.0
+        env:
+          # The image sets rseq=0 for tcmalloc; mongod < 8.0.37 then refuses to boot on the
+          # runner's Ubuntu 7.0.0 kernel (SERVER-121912, SERVER-131779).
+          GLIBC_TUNABLES: glibc.pthread.rseq=1
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      MONGO_TEST_URI: mongodb://127.0.0.1:27017/roisalen-test
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test --workspace=@roisalen/api
+
+  web-test:
+    name: Web tests and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test --workspace=@roisalen/web
+      - run: npm run build
+
+  e2e:
+    name: E2E (Playwright, mocked API and real API + MongoDB 8.0)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      mongo:
+        image: mongo:8.0
+        env:
+          # The image sets rseq=0 for tcmalloc; mongod < 8.0.37 then refuses to boot on the
+          # runner's Ubuntu 7.0.0 kernel (SERVER-121912, SERVER-131779).
+          GLIBC_TUNABLES: glibc.pthread.rseq=1
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      MONGO_URI: mongodb://127.0.0.1:27017/roisalen-e2e
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm exec --workspace=@roisalen/web -- playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run test:e2e:fullstack
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-reports
+          path: |
+            apps/web/playwright-report
+            apps/web/playwright-report-fullstack
+            apps/web/test-results
+            apps/web/test-results-fullstack
+          retention-days: 7
+
+  docker:
+    name: Docker build and smoke test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: docker build -f apps/api/Dockerfile -t roisalen-api:ci .
+      - name: Refuses to start without production config
+        run: |
+          if docker run --rm roisalen-api:ci; then
+            echo "::error::image started without MONGO_URI"; exit 1
+          fi
+      - name: Smoke test against MongoDB 8.0
+        run: |
+          docker network create ci
+          docker run -d --name mongo --network ci -e GLIBC_TUNABLES=glibc.pthread.rseq=1 mongo:8.0
+          docker run -d --name api --network ci -p 8080:8080 \
+            -e MONGO_URI=mongodb://mongo:27017/roisalen \
+            -e ALLOWED_ORIGINS=https://roisalen.no \
+            roisalen-api:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/status; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:8080/status | grep -q "db is ok"
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Origin: https://evil.example' http://127.0.0.1:8080/status)
+          test "$code" = "403"
+      - if: failure()
+        run: docker logs api || true
+
+  ci-ok:
+    name: CI OK
+    if: always()
+    needs: [lint, api-test, web-test, e2e, docker]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All required jobs succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for r in $RESULTS; do
+            if [ "$r" != "success" ]; then exit 1; fi
+          done
